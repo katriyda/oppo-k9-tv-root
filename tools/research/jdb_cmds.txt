@@ -1,0 +1,4 @@
+eval android.os.SystemProperties.get("ro.build.type")
+eval new java.io.File("/factory").list()
+eval Runtime.getRuntime().exec("touch /data/local/tmp/jdb_ok")
+exit

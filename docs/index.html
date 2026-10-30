@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>OPPO K9 电视 root 指南</title>
+<style>
+:root{
+  --bg:#f6f7f9; --fg:#16181d; --muted:#5c6370; --card:#fff; --border:#e2e5ea;
+  --accent:#2f6fed; --warn:#b4530a; --ok:#1a7f4b; --code-bg:#14161b; --code-fg:#e8ecf1;
+  --radius:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#0f1115; --fg:#e9ecf1; --muted:#98a0ad; --card:#171a21; --border:#262b35;
+         --accent:#7aa2ff; --warn:#e2a35a; --ok:#5bd39a; --code-bg:#0b0d11; --code-fg:#e8ecf1; }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  padding:0 max(14px, env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+}
+main{max-width:760px;margin:0 auto}
+header{padding:28px 0 8px}
+h1{font-size:1.5rem;line-height:1.3;margin:0 0 6px}
+.sub{color:var(--muted);font-size:.9rem;margin:0}
+h2{font-size:1.14rem;margin:34px 0 10px;padding-top:6px;border-top:1px solid var(--border)}
+h3{font-size:1rem;margin:20px 0 6px}
+p{margin:10px 0}
+ul,ol{padding-left:1.25em;margin:10px 0}
+li{margin:5px 0}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9em;
+     background:color-mix(in srgb, var(--fg) 8%, transparent);padding:.1em .35em;border-radius:5px}
+pre{background:var(--code-bg);color:var(--code-fg);border-radius:var(--radius);padding:14px;overflow-x:auto;
+    -webkit-overflow-scrolling:touch;font-size:.85rem;line-height:1.6;position:relative}
+pre code{background:none;padding:0;color:inherit;font-size:1em}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 0}
+.badge{font-size:.75rem;padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--muted)}
+.badge.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,transparent)}
+.badge.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0}
+.card h3{margin-top:0}
+.steps{counter-reset:s;list-style:none;padding:0;margin:14px 0}
+.steps>li{position:relative;padding:14px 16px 14px 52px;background:var(--card);border:1px solid var(--border);
+          border-radius:var(--radius);margin:10px 0}
+.steps>li::before{counter-increment:s;content:counter(s);position:absolute;left:14px;top:14px;width:26px;height:26px;
+          border-radius:50%;background:var(--accent);color:#fff;font-size:.85rem;font-weight:600;
+          display:flex;align-items:center;justify-content:center}
+.steps>li b{display:block;margin-bottom:2px}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:12px 0;border:1px solid var(--border);border-radius:var(--radius);background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:.88rem;min-width:440px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:.8rem;text-transform:none;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+.flow{display:flex;flex-direction:column;gap:0;margin:16px 0}
+.flow .node{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 13px;font-size:.88rem}
+.flow .node b{font-weight:600}
+.flow .node span{display:block;color:var(--muted);font-size:.8rem;margin-top:2px}
+.flow .arrow{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.78rem;padding:5px 0 5px 13px}
+.flow .arrow::before{content:"";width:2px;height:16px;background:var(--border);border-radius:2px;flex:none}
+.flow .arrow.hi{color:var(--accent)}
+.kv{display:grid;grid-template-columns:1fr;gap:8px;margin:12px 0}
+@media(min-width:560px){.kv{grid-template-columns:1fr 1fr}}
+.kv div{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 13px;font-size:.88rem}
+.kv div b{display:block;font-size:.78rem;color:var(--muted);font-weight:600;margin-bottom:2px}
+.note{border-left:3px solid var(--warn);background:color-mix(in srgb,var(--warn) 8%,transparent);
+      border-radius:0 12px 12px 0;padding:11px 14px;margin:14px 0;font-size:.9rem}
+.warnbox{border-left:3px solid var(--warn)}
+.mem{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem;color:var(--muted);word-break:break-word}
+details{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:0;margin:9px 0;overflow:hidden}
+summary{cursor:pointer;font-weight:600;font-size:.94rem;padding:14px 16px;min-height:48px;display:flex;align-items:center;list-style-position:inside}
+summary::-webkit-details-marker{margin-right:6px}
+details[open] summary{border-bottom:1px solid var(--border)}
+details>p{padding:0 16px 14px;margin:0}
+.links{list-style:none;padding:0;margin:12px 0}
+.links li{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:8px 0}
+.links a{display:flex;align-items:center;min-height:48px;padding:8px 16px;font-size:.92rem}
+.links a code{font-size:.86em;margin-right:6px}
+.links a span{color:var(--muted);font-size:.85rem;margin-left:auto;padding-left:10px}
+footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--border);color:var(--muted);font-size:.82rem}
+a{color:var(--accent);text-decoration:none}
+a:active{opacity:.7}
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <h1>OPPO K9 电视 root 指南</h1>
+  <p class="sub">OPPOCNM632 · m7332(MT9632)· Android 9 · 内核 4.9.118(32 位用户态)</p>
+  <div class="badges">
+    <span class="badge ok">可按需取 root(uid=0 + 满 capability)</span>
+    <span class="badge ok">无监听端口 / 无常驻进程</span>
+    <span class="badge">默认 Enforcing</span>
+    <span class="badge">/system 无改动</span>
+  </div>
+</header>
+
+<h2>快速开始</h2>
+<p>前提:PC 与电视同一局域网,已装 <code>adb</code>。</p>
+<ol class="steps">
+  <li>
+    <b>连接电视</b>
+    <pre><code>adb connect <TV_IP>:5555</code></pre>
+  </li>
+  <li>
+    <b>放开 SELinux(约 40 秒,设备每次重启后需要跑一次)</b>
+    <pre><code>adb shell 'dumpsys tvapisvc -cmd "sh /sdcard/r1.sh"'</code></pre>
+    <p class="mem">验证:<code>adb shell getenforce</code> → Permissive</p>
+  </li>
+  <li>
+    <b>终端直取 root</b>
+    <pre><code>adb shell                    # 进入电视
+$ sh /data/local/tmp/su.sh   # 交互 root shell,exit 即回普通 shell</code></pre>
+    <p class="mem">单条命令形式:<code>adb shell 'sh /data/local/tmp/su.sh id'</code></p>
+  </li>
+</ol>
+<div class="note">整个过程不创建监听端口、不留常驻进程;用完即失效。需要 root 时再跑一遍即可。</div>
+
+<h2>原理</h2>
+
+<div class="card">
+  <h3>① 核心原语:内核物理内存读写</h3>
+  <p>设备遗留了 MStar 的 mpool 调试驱动 <code>/dev/malloc</code>,权限 <code>crw-rw-rw-</code>(任何 uid 可打开)。通过 ioctl 指定总线物理地址段,再用 mmap 映射,即可把 DRAM 当作普通数组读写——<b>包括内核数据区</b>。</p>
+  <pre><code>struct mpool_info { u64 addr, size, interval; u8 miusel, pad[7]; };  // 32 字节
+ioctl(fd, 0x80204d04, &amp;info);   // MPOOL_IOC_SET
+p = mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+// 映射偏移 = 总线地址 - 0x20000000</code></pre>
+  <p class="mem">已验证地址:init_cred 0x2122d590、enforcing 0x2137bdfc、init_task 0x2121a880</p>
+</div>
+
+<div class="card">
+  <h3>② 提权:patch 自己的 cred</h3>
+  <p>进程身份由内核里的 <code>cred</code> 结构决定,前 8 个字段连续排列:</p>
+  <pre><code>uid  gid  suid  sgid  euid  egid  fsuid  fsgid</code></pre>
+  <p>扫描内存找"连续 8 个等于本进程 uid"的位置,改为 0、securebits 置 0、capability 置满,然后立即 <code>getuid()</code> 自证:</p>
+  <ul>
+    <li>返回 0 → 命中自己的 cred,成功;</li>
+    <li>不是 0 → 改到了别的同 uid 进程,<b>逐字节还原</b>后继续扫。</li>
+  </ul>
+  <p class="mem">这个"patch→自证→失败回滚"让扫描本身是安全的,不会误伤其它进程。</p>
+</div>
+
+<div class="card">
+  <h3>③ SELinux:只改一个标志位</h3>
+  <p>UNIX 权限之外还有 SELinux 强制访问控制——这就是早期"uid=0 却什么都不能干"的原因(域受限)。本方案只把全局 <code>enforcing</code> 标志位写 0,<b>不改策略、不加规则、不加载模块</b>;效果易失:重启或 <code>setenforce 1</code> 即恢复。</p>
+</div>
+
+<div class="card">
+  <h3>④ 代码注入链:两步借道</h3>
+  <p>每个 SELinux 域能执行的文件是钉死的,所以要分两步"借道":</p>
+  <div class="flow">
+    <div class="node"><b>1 · PC adb shell</b><span>域 shell,uid 2000</span></div>
+    <div class="arrow hi">dumpsys tvapisvc -cmd</div>
+    <div class="node"><b>2 · com.heytap.tvapiservice</b><span>域 system_app,uid 1000,可执行任意 shell</span></div>
+    <div class="arrow">CLASSPATH jar + app_process</div>
+    <div class="node"><b>3 · 在 system_app 域内运行任意 dex</b><span>策略允许 appdomain 执行 zygote_exec(execute_no_trans)</span></div>
+    <div class="arrow">System.load</div>
+    <div class="node"><b>4 · 载体 APK 的 lib 目录</b><span>apk_data_file — system_app 唯一可执行的位置(APK 仅 12.7KB)</span></div>
+    <div class="arrow hi">8×1000 cred patch + enforcing=0</div>
+    <div class="node"><b>5 · 全局 Permissive</b><span>shell 域自身无 /dev/malloc 权限,必须借这一步打开门</span></div>
+    <div class="arrow hi">sh /data/local/tmp/su.sh</div>
+    <div class="node"><b>6 · shell 域进程 8×2000 cred patch</b><span>/data/local/tmp 对 shell 域可执行,无需 APK</span></div>
+    <div class="arrow">ProcessBuilder inheritIO</div>
+    <div class="node"><b>7 · 你的终端就是 uid=0</b><span>不再 fork 任何服务</span></div>
+  </div>
+</div>
+
+<h2>为什么必须这么绕</h2>
+<div class="scroll">
+<table>
+  <thead><tr><th>约束(来自 SELinux 策略)</th><th>后果</th></tr></thead>
+  <tbody>
+    <tr><td>shell 域对 <code>/dev/malloc</code> 无 allow</td><td>Enforcing 下 adb shell 自己开不了 malloc → 必须先做 Step 1</td></tr>
+    <tr><td>appdomain 可执行 <code>zygote_exec</code></td><td><code>app_process</code> 可在<b>调用者自己的域</b>里跑任意 dex</td></tr>
+    <tr><td>system_app 只能执行 <code>apk_data_file</code></td><td>自建 native 代码必须装进一个 APK 的 lib 目录 → 载体 APK</td></tr>
+    <tr><td>shell 域可执行 <code>shell_data_file</code></td><td>Step 2 的 so 放 <code>/data/local/tmp</code> 即可</td></tr>
+    <tr><td>dumpsys 通道按空格裸分词</td><td>复杂命令必须写成脚本再用 <code>sh 脚本</code> 调用</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>设备上依赖的文件</h2>
+<div class="kv">
+  <div><b>载体 APK</b>com.zz.libhost(12.7KB,自签)— Step 1 必需,勿卸载</div>
+  <div><b>/sdcard</b>main2.jar(Step 1 dex)、r1.sh(Step 1 脚本)</div>
+  <div><b>/data/local/tmp</b>su.sh、main5.jar、librooterm2000.so</div>
+  <div><b>工具与配方</b>tools/research/malloc/session-2026-10-30/</div>
+</div>
+
+<h2>常见问题</h2>
+<details><summary><code>su.sh</code> 输出 uid=2000,不是 0</summary><p>Step 1 没生效(或设备重启过)。重跑 Step 1,确认 <code>getenforce</code> 为 Permissive 后再执行 Step 2。</p></details>
+<details><summary>Step 1 没有任何输出 / 报错</summary><p><code>/sdcard/r1.sh</code> 或 <code>/sdcard/main2.jar</code> 丢失,按 session 目录里的配方用 <code>adb push</code> 补回即可。</p></details>
+<details><summary>重启后要做什么</summary><p>从"快速开始"第 1 步重跑即可;设备默认回到 Enforcing,且不会有任何 root 残留。</p></details>
+<details><summary>能否开机自动获得 root</summary><p>刻意不做。10-29 尝试过改 rootfs 做持久化,因 <code>cp</code> 覆盖破坏了 <code>/system/bin/adbd</code> 的 SELinux 标签,重启后 adbd 崩溃循环、设备远程失联。详见 <code>docs/04-history.md</code>。</p></details>
+<details><summary>为什么不用 4445 那种 root 服务</summary><p>无鉴权监听端口等于给局域网留后门。现在改为让当前终端进程自身变 root(<code>inheritIO</code> 接管终端),用完退出即无痕。</p></details>
+
+<h2>边界与风险</h2>
+<div class="note warnbox">
+  <p><b>能力</b>:uid=0 + 满 capability + 可改 SELinux 状态 + 可 <code>mount -o remount,rw /</code> 写 rootfs。</p>
+  <p><b>限制</b>:cred patch 只作用于该进程及其子进程,退出即消失;enforcing 位易失;SELinux 域仍是 shell,恢复 Enforcing 后域策略照旧生效。</p>
+  <p><b>风险</b>:本质是直接写内核物理内存,地址写错可能 panic 或损坏存储(故只用已验证地址段 + 自证回滚)。平时 <code>5555</code> 网络 ADB 常开,同网段任何人可获得 shell 权限,不用时建议关闭。</p>
+</div>
+
+<h2>延伸阅读</h2>
+<ul class="links">
+  <li><a href="./03-root-access.md"><code>03-root-access.md</code><span>现行方案</span></a></li>
+  <li><a href="./02-malloc-physical-rw.md"><code>02-malloc-physical-rw.md</code><span>物理内存读写</span></a></li>
+  <li><a href="./01-device-and-limits.md"><code>01-device-and-limits.md</code><span>设备与边界</span></a></li>
+  <li><a href="./04-history.md"><code>04-history.md</code><span>历史与教训</span></a></li>
+  <li><a href="./05-evidence-index.md"><code>05-evidence-index.md</code><span>证据索引</span></a></li>
+</ul>
+
+<footer>
+  <p>最后验证:2026-10-30(设备真重启后,在 Enforcing 状态下端到端实测通过)。<br>
+  仅供本人设备的研究与维护使用。</p>
+</footer>
+
+</main>
+</body>
+</html>

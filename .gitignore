@@ -1,0 +1,18 @@
+# 本地私有内容(设备原始证据、厂商二进制、会话日志)——不公开
+_local/
+.agents/
+out.b64
+*.logtv
+*.log
+
+# 构建产物
+*.o
+*.b64
+__pycache__/
+node_modules/
+
+# 编辑器/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

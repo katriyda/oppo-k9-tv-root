@@ -1,0 +1,6 @@
+import com.sun.jdi.*;import com.sun.jdi.connect.*;import java.util.*;
+public class JdiKill{
+ static Method find(ReferenceType t,String n,String s){for(Method m:t.methodsByName(n))if(m.signature().equals(s))return m;return null;}
+ public static void main(String[] a)throws Exception{AttachingConnector conn=null;for(AttachingConnector c:Bootstrap.virtualMachineManager().attachingConnectors())if(c.name().equals("com.sun.jdi.SocketAttach"))conn=c;Map<String,Connector.Argument> ca=conn.defaultArguments();ca.get("hostname").setValue("localhost");ca.get("port").setValue("8700");ca.get("timeout").setValue("5000");VirtualMachine vm=conn.attach(ca);
+ try{vm.suspend();ThreadReference thr=null;for(ThreadReference t:vm.allThreads()){if(t.isSuspended()){thr=t;break;}}System.out.println("thr="+thr);ClassType p=(ClassType)vm.classesByName("android.os.Process").get(0);Method mypid=find(p,"myPid","()I");int pid=((IntegerValue)p.invokeMethod(thr,mypid,Collections.emptyList(),0)).value();System.out.println("pid="+pid);Method kill=find(p,"killProcess","(I)V");p.invokeMethod(thr,kill,Collections.singletonList(vm.mirrorOf(pid)),0);System.out.println("killed");}catch(InvocationException ie){ObjectReference e=ie.exception();System.out.println("EX "+e.referenceType().name());}finally{try{vm.resume();}catch(Throwable t){}try{vm.dispose();}catch(Throwable t){}}}
+}

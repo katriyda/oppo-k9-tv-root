@@ -1,0 +1,7 @@
+typedef unsigned int u32;
+#define SYS_open 5
+#define SYS_write 4
+#define SYS_close 6
+static long sc(long n,long a,long b,long c,long d){register long r7 asm("r7")=n;register long r0 asm("r0")=a;register long r1 asm("r1")=b;register long r2 asm("r2")=c;register long r3 asm("r3")=d;asm volatile("svc #0":"+r"(r0):"r"(r7),"r"(r1),"r"(r2),"r"(r3):"memory");return r0;}
+static void w(int fd,const char*s){int n=0;while(s[n])n++;sc(SYS_write,fd,(long)s,n,0);}
+__attribute__((constructor)) static void ctor(void){int fd=sc(SYS_open,(long)"/data/data/com.cvte.factory.service/files/marker.log",0x241,0666,0);if(fd>=0){w(fd,"MARKER\n");sc(SYS_close,fd,0,0,0);} }
